@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The 8-Puzzle as a Search Problem</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --card-bg: #ffffff;
+            --code-bg: #282c34;
+            --code-color: #abb2bf;
+            --border-color: #e1e4e8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            scroll-behavior: smooth;
+        }
+
+        /* Presentation Container */
+        .slide-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Individual Slide Style */
+        .slide {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            margin-bottom: 40px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            border-top: 6px solid var(--accent-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-top: 25px;
+        }
+
+        p {
+            line-height: 1.6;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            line-height: 1.6;
+            font-size: 1.1rem;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f1f3f4;
+        }
+
+        /* Code Block Styling */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin: 20px 0;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Highlighting specific code syntax */
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+        .number { color: #d19a66; }
+
+        /* Image Explanation Block */
+        .image-explanation {
+            background-color: #e8f4f8;
+            border-left: 6px solid var(--accent-color);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .image-explanation h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        /* SVG Graph Container Styling */
+        .graph-container {
+            background: #fafbfc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            /* CSS Variables needed for the embedded SVG */
+            --surface-1: #ffffff;
+            --bg-warning: #faeeda;
+            --border: #c3c2b7;
+            --border-strong: #a5a49a;
+        }
+
+        /* Embedded SVG Styles specific to the provided graph */
+        .graph-container .t { font-size: 14px; fill: var(--text-color); }
+        .graph-container .ts { font-size: 12px; fill: #666; }
+        .graph-container .th { font-size: 14px; fill: var(--text-color); font-weight: 500; }
+        .graph-container .box { fill: none; stroke: var(--border-strong); }
+        .graph-container .arr { stroke: #777; fill: none; stroke-width: 1.5; }
+        
+        /* Colors for the state nodes */
+        .graph-container .c-purple > rect { fill: #eeedfe; stroke: #534ab7; }
+        .graph-container .c-purple > .ts { fill: #534ab7; }
+        .graph-container .c-teal > rect { fill: #e1f5ee; stroke: #0f6e56; }
+        .graph-container .c-teal > .ts { fill: #0f6e56; }
+
+        /* Footer/Credits */
+        .credits-footer {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #555;
+            margin-top: 10px;
+            padding: 30px 20px;
+            border-top: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 1000px;
+            box-sizing: border-box;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .credits-footer p {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+
+        .credits-footer strong {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .slide { padding: 20px; }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.4rem; }
+            p, ul, table { font-size: 1rem; }
+            pre { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+
+        <!-- Slide 1: Introduction and Formulation -->
+        <div class="slide">
+            <h1>1. The 8-Puzzle: Problem Formulation</h1>
+            <p>The 8-puzzle is a 3×3 grid with tiles numbered 1-8 and one blank space. You slide tiles into the blank until the board matches the goal state.</p>
+            
+            <h2>Formalizing the Problem</h2>
+            <table>
+                <tr>
+                    <th>Element</th>
+                    <th>Description in the 8-Puzzle</th>
+                </tr>
+                <tr>
+                    <td><strong>State</strong></td>
+                    <td>The arrangement of the 9 cells (e.g., <code>(1,2,3,4,5,6,7,8,0)</code> where <code>0</code> is the blank).</td>
+                </tr>
+                <tr>
+                    <td><strong>Actions</strong></td>
+                    <td>Move the blank up, down, left, or right (if it stays on the board).</td>
+                </tr>
+                <tr>
+                    <td><strong>Transition</strong></td>
+                    <td>Swap the blank with the neighboring tile.</td>
+                </tr>
+                <tr>
+                    <td><strong>Initial State</strong></td>
+                    <td>The scrambled board.</td>
+                </tr>
+                <tr>
+                    <td><strong>Goal Test</strong></td>
+                    <td><code>state == (1,2,3,4,5,6,7,8,0)</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Path Cost</strong></td>
+                    <td>1 per move, so the cheapest path is the fewest moves.</td>
+                </tr>
+            </table>
+            <p>This is a graph. Each board is a node, each legal slide is an edge, and the graph has 181,440 reachable states. Because cycles exist, a visited set is required.</p>
+        </div>
+
+        <!-- Slide 2: Shared Setup -->
+        <div class="slide">
+            <h1>2. Shared Setup & Scramble</h1>
+            <p>Before implementing the algorithms, we need a way to generate neighboring states and create solvable scrambled puzzles.</p>
+            
+            <pre><code><span class="keyword">import</span> random, heapq
+<span class="keyword">from</span> collections <span class="keyword">import</span> deque
+
+GOAL = (<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">0</span>)
+
+<span class="keyword">def</span> <span class="function">neighbors</span>(state):
+    i = state.index(<span class="number">0</span>)
+    r, c = divmod(i, <span class="number">3</span>)
+    <span class="keyword">for</span> dr, dc <span class="keyword">in</span> ((-<span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>), (<span class="number">0</span>, -<span class="number">1</span>), (<span class="number">0</span>, <span class="number">1</span>)):
+        nr, nc = r + dr, c + dc
+        <span class="keyword">if</span> <span class="number">0</span> <= nr < <span class="number">3</span> <span class="keyword">and</span> <span class="number">0</span> <= nc < <span class="number">3</span>:
+            j = nr * <span class="number">3</span> + nc
+            s = list(state)
+            s[i], s[j] = s[j], s[i]
+            <span class="keyword">yield</span> tuple(s)
+
+<span class="keyword">def</span> <span class="function">scramble</span>(moves=<span class="number">25</span>):
+    <span class="comment"># Random walk from the goal guarantees the puzzle is solvable</span>
+    s = GOAL
+    <span class="keyword">for</span> _ <span class="keyword">in</span> range(moves):
+        s = random.choice(list(neighbors(s)))
+    <span class="keyword">return</span> s</code></pre>
+            <p><strong>Note:</strong> Half of all random arrangements of the 8-puzzle are unsolvable, so scrambling by legal moves from the goal is the safe way to generate a start state.</p>
+        </div>
+
+        <!-- Slide 3: BFS -->
+        <div class="slide">
+            <h1>3. Uninformed Search: BFS</h1>
+            <p>Breadth-First Search (BFS) is the same BFS you already know. It explores every board 1 move away, then 2 moves away, and so on. It is guaranteed to find the fewest-move solution, but it has no idea which direction is "toward" the goal, so it expands a huge number of irrelevant boards.</p>
+            
+            <pre><code><span class="keyword">def</span> <span class="function">bfs</span>(start):
+    visited = {start}
+    queue = deque([(start, <span class="number">0</span>)])
+    expanded = <span class="number">0</span>
+    <span class="keyword">while</span> queue:
+        state, depth = queue.popleft()
+        expanded += <span class="number">1</span>
+        <span class="keyword">if</span> state == GOAL:
+            <span class="keyword">return</span> depth, expanded
+        <span class="keyword">for</span> nxt <span class="keyword">in</span> neighbors(state):
+            <span class="keyword">if</span> nxt <span class="keyword">not in</span> visited:
+                visited.add(nxt)
+                queue.append((nxt, depth + <span class="number">1</span>))</code></pre>
+        </div>
+
+        <!-- Slide 4: A* -->
+        <div class="slide">
+            <h1>4. Informed Search: A*</h1>
+            <p>A* picks the next node by <strong>f(n) = g(n) + h(n)</strong>:</p>
+            <ul>
+                <li><strong>g(n):</strong> moves made so far (known cost)</li>
+                <li><strong>h(n):</strong> estimated moves remaining (the heuristic)</li>
+            </ul>
+            <p>For <strong>h</strong>, we use <strong>Manhattan distance</strong>: for each tile, count how many rows plus columns it is from its goal position, and sum them.</p>
+
+            <pre><code><span class="keyword">def</span> <span class="function">manhattan</span>(state):
+    total = <span class="number">0</span>
+    <span class="keyword">for</span> idx, tile <span class="keyword">in</span> enumerate(state):
+        <span class="keyword">if</span> tile != <span class="number">0</span>:
+            goal_idx = tile - <span class="number">1</span>
+            total += abs(idx // <span class="number">3</span> - goal_idx // <span class="number">3</span>) + abs(idx % <span class="number">3</span> - goal_idx % <span class="number">3</span>)
+    <span class="keyword">return</span> total
+
+<span class="keyword">def</span> <span class="function">a_star</span>(start):
+    best_g = {start: <span class="number">0</span>}
+    heap = [(manhattan(start), <span class="number">0</span>, start)]
+    expanded = <span class="number">0</span>
+    <span class="keyword">while</span> heap:
+        f, g, state = heapq.heappop(heap)
+        <span class="keyword">if</span> g > best_g[state]:
+            <span class="keyword">continue</span>  <span class="comment"># stale entry</span>
+        expanded += <span class="number">1</span>
+        <span class="keyword">if</span> state == GOAL:
+            <span class="keyword">return</span> g, expanded
+        <span class="keyword">for</span> nxt <span class="keyword">in</span> neighbors(state):
+            ng = g + <span class="number">1</span>
+            <span class="keyword">if</span> ng < best_g.get(nxt, float(<span class="string">"inf"</span>)):
+                best_g[nxt] = ng
+                heapq.heappush(heap, (ng + manhattan(nxt), ng, nxt))</code></pre>
+        </div>
+
+        <!-- Slide 5: Comparison & Why it works -->
+        <div class="slide">
+            <h1>5. Comparison & Why This Works</h1>
+            <p>When you run the comparison, you should see two things:</p>
+            <ol>
+                <li><strong>Both report the same solution length.</strong> A* is still optimal here, because Manhattan distance never overestimates the true remaining cost (it is <em>admissible</em>).</li>
+                <li><strong>A* expands far fewer nodes</strong>, and the gap grows as the puzzle gets harder to solve.</li>
+            </ol>
+
+            <h3>Why this works:</h3>
+            <ul>
+                <li><strong>Admissible heuristic:</strong> Every tile needs at least its Manhattan distance in moves, so <em>h</em> never overestimates. That is the condition for A* to stay optimal.</li>
+                <li><strong>Heuristics prune, not guess:</strong> A* does not skip the optimal path. It just postpones boards that look far from the goal.</li>
+                <li><strong>BFS is a special case of A*:</strong> Set <em>h(n) = 0</em> and A* behaves like uniform-cost search, which is BFS when every move costs 1. A better heuristic means less wasted search.</li>
+                <li><strong>Better heuristics are a design problem:</strong> Try replacing Manhattan with "number of misplaced tiles." It is also admissible but weaker, so A* will expand more nodes. A stronger heuristic means less search.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 6: Image Explanation (The Attached Graph) -->
+        <div class="slide">
+            <h1>6. Visualizing the Search Tree</h1>
+            
+            <div class="graph-container">
+                <!-- Embedded SVG Graph from the provided file -->
+                <svg id="g8" width="100%" viewBox="0 0 680 490" role="img" style="max-width: 680px;">
+                    <title>8-puzzle state graph, t0 to t3</title>
+                    <desc>A tree of 8-puzzle boards. The start board at t0 has two children at t1, four boards at t2 including the goal, and seven boards at t3.</desc>
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </marker>
+                    </defs>
+                    <g id="layer"></g>
+                </svg>
+            </div>
+
+            <div class="image-explanation">
+                <h3>Explanation of the Search Tree</h3>
+                <p>The image above illustrates the <strong>search tree</strong> for the 8-puzzle. It shows how a search algorithm explores possible moves from the starting state until it reaches the goal.</p>
+                <ul>
+                    <li><strong>t0 (Start):</strong> The initial scrambled board. The blank is at the bottom left.</li>
+                    <li><strong>t1 (1 move):</strong> The two possible legal moves from the start state. The blank can slide up or right. The tree branches into two children.</li>
+                    <li><strong>t2 (2 moves):</strong> The tree expands further. Notice how some branches show duplicate states (a cycle) or states that don't lead to the goal. The algorithm must keep track of visited states to avoid infinite loops.</li>
+                    <li><strong>t3 (3 moves):</strong> The tree continues to expand. One of the nodes at this depth matches the goal state (top-left corner numbers 1,2,3 in the first row, and blank at the bottom right). The search stops here (indicated by "goal found, stop here").</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> This visualizes uninformed search (like BFS). The algorithm explores level by level. In contrast, A* would use a heuristic to prioritize exploring the branch that looks closest to the goal, skipping many of the nodes shown on the left side of this tree.</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Try Next -->
+        <div class="slide">
+            <h1>7. Try Next</h1>
+            <ul>
+                <li>Swap in "misplaced tiles" and compare node counts across all three methods.</li>
+                <li>Add <strong>greedy best-first search</strong> (use only <em>h</em>) and see it run fast but sometimes return longer solutions.</li>
+                <li>Try a 15-puzzle (4×4). BFS becomes impractical, while A* with a good heuristic still works, which shows why informed search matters.</li>
+            </ul>
+            <p>You can also walk through the same exercise on a maze or grid map, where you can visualize the explored cells.</p>
+        </div>
+
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits-footer">
+        <p><strong>Credits & Acknowledgements</strong></p>
+        <p>This slide deck and its visualizations were created with the assistance of AI models: <strong>Claude.ai</strong>, <strong>DeepSeek</strong>, and <strong>ChatGPT</strong>.</p>
+        <p>All content has been verified and reviewed by the lecturer to ensure accuracy and pedagogical quality.</p>
+    </div>
+
+    <!-- Script to render the SVG Graph dynamically -->
+    <script>
+    (function(){
+        var CELL=17, W=CELL*3, tops=[50,160,270,380];
+        var X=function(i){return 124+i*68;};
+        var N={
+            S:{s:"123456078",l:0,x:X(3.5),c:"c-purple"},
+            A:{s:"123056478",l:1,x:X(1.5)},
+            B:{s:"123456708",l:1,x:X(5.5)},
+            C:{s:"023156478",l:2,x:X(0)},
+            D:{s:"123506478",l:2,x:X(2)},
+            G:{s:"123456780",l:2,x:X(4),c:"c-teal"},
+            E:{s:"123406758",l:2,x:X(6)},
+            C1:{s:"203156478",l:3,x:X(0)},
+            D1:{s:"103526478",l:3,x:X(1)},
+            D2:{s:"123560478",l:3,x:X(2)},
+            D3:{s:"123576408",l:3,x:X(3)},
+            E1:{s:"103426758",l:3,x:X(5)},
+            E2:{s:"123046758",l:3,x:X(6)},
+            E3:{s:"123460758",l:3,x:X(7)}
+        };
+        var edges=[["S","A"],["S","B"],["A","C"],["A","D"],["B","G"],["B","E"],["C","C1"],["D","D1"],["D","D2"],["D","D3"],["E","E1"],["E","E2"],["E","E3"]];
+        var h="";
+        
+        // Draw edges
+        edges.forEach(function(e){
+            var p=N[e[0]],q=N[e[1]];
+            h+='<line class="arr" x1="'+p.x+'" y1="'+(tops[p.l]+W+3)+'" x2="'+q.x+'" y2="'+(tops[q.l]-4)+'" marker-end="url(#arrow)"/>';
+        });
+
+        // Draw nodes
+        Object.keys(N).forEach(function(k){
+            var n=N[k],left=n.x-W/2,top=tops[n.l],i=n.s.indexOf("0");
+            var inner="";
+            
+            // Highlight blank tile
+            inner+='<rect x="'+(left+(i%3)*CELL)+'" y="'+(top+Math.floor(i/3)*CELL)+'" width="'+CELL+'" height="'+CELL+'" style="fill:#faeeda;stroke:none"/>';
+            
+            // Grid lines
+            inner+='<path d="M'+(left+CELL)+' '+top+'v'+W+'M'+(left+2*CELL)+' '+top+'v'+W+'M'+left+' '+(top+CELL)+'h'+W+'M'+left+' '+(top+2*CELL)+'h'+W+'" fill="none" style="stroke:#d2d1c7;stroke-width:0.5"/>';
+            
+            // Numbers
+            for(var j=0;j<9;j++){
+                if(n.s[j]!=="0"){
+                    inner+='<text class="ts" x="'+(left+(j%3)*CELL+CELL/2)+'" y="'+(top+Math.floor(j/3)*CELL+CELL/2)+'" text-anchor="middle" dominant-baseline="central">'+n.s[j]+'</text>';
+                }
+            }
+            
+            // Outer Box
+            var outer='<rect x="'+left+'" y="'+top+'" width="'+W+'" height="'+W+'" rx="3" stroke-width="0.5" '+(n.c?'class="'+n.c+'"':'class="box"')+' style="fill:none"/>';
+            
+            h+='<g'+(n.c?' class="'+n.c+'"':'')+'>'+inner+outer+'</g>';
+        });
+
+        // Labels
+        var labs=[["t0","start"],["t1","1 move"],["t2","2 moves"],["t3","3 moves"]];
+        labs.forEach(function(t,i){
+            h+='<text class="th" x="40" y="'+(tops[i]+20)+'">'+t[0]+'</text><text class="ts" x="40" y="'+(tops[i]+38)+'">'+t[1]+'</text>';
+        });
+        
+        // Goal text
+        h+='<text class="ts" x="'+X(4)+'" y="'+(tops[3]+20)+'" text-anchor="middle">goal found,</text><text class="ts" x="'+X(4)+'" y="'+(tops[3]+38)+'" text-anchor="middle">stop here</text>';
+        
+        // Legend
+        h+='<g class="c-purple"><rect x="60" y="455" width="14" height="14" rx="2" stroke-width="0.5"/></g><text class="ts" x="82" y="463" dominant-baseline="central">start state</text>';
+        h+='<g class="c-teal"><rect x="190" y="455" width="14" height="14" rx="2" stroke-width="0.5"/></g><text class="ts" x="212" y="463" dominant-baseline="central">goal state</text>';
+        h+='<rect x="320" y="455" width="14" height="14" rx="2" style="fill:#faeeda;stroke:#c3c2b7;stroke-width:0.5"/><text class="ts" x="342" y="463" dominant-baseline="central">blank (the tile that moves)</text>';
+        
+        // Inject the SVG content
+        document.getElementById("layer").innerHTML=h;
+    })();
+    </script>
+</body>
+</html>
