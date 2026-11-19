@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Literacy Workshop · Missions 1–8</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0b1a2e 0%, #1a2f3f 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .workshop-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 3rem;
+      padding: 1.8rem;
+      box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .slide-viewport {
+      background: #f8fafc;
+      border-radius: 2rem;
+      padding: 2rem 2.2rem;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+      transition: background 0.3s;
+    }
+
+    .mission-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 3px solid #2d6a4f;
+    }
+
+    .mission-badge {
+      background: #2d6a4f;
+      color: white;
+      font-weight: 700;
+      padding: 0.35rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .mission-duration {
+      color: #1e3a3a;
+      font-weight: 600;
+      background: #d8f3dc;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0b1a2e;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2 span {
+      background: #ffd966;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 1.2rem;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1e3a3a;
+      margin: 1rem 0 0.6rem;
+    }
+
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+      max-height: 440px;
+    }
+
+    .content-area::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .content-area::-webkit-scrollbar-thumb {
+      background: #a0c4b8;
+      border-radius: 20px;
+    }
+
+    .interactive-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.6rem;
+    }
+
+    .interactive-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1rem 1.3rem;
+      flex: 1 1 220px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+      border: 1px solid #e2e8f0;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .interactive-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.15);
+    }
+
+    .clickable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .reveal-btn {
+      background: #e9f5f0;
+      border: none;
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 600;
+      color: #1e3a3a;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: 0.15s;
+      border: 1px solid #b7d9cc;
+      font-size: 0.9rem;
+    }
+
+    .reveal-btn:hover {
+      background: #d0e8df;
+    }
+
+    .hidden-reveal {
+      margin-top: 0.8rem;
+      background: #f0f7f4;
+      border-left: 6px solid #2d6a4f;
+      padding: 1rem 1.2rem;
+      border-radius: 1rem;
+      display: none;
+    }
+
+    .hidden-reveal.show {
+      display: block;
+    }
+
+    .quiz-option {
+      background: #f1f5f9;
+      border-radius: 1rem;
+      padding: 0.7rem 1rem;
+      margin: 0.4rem 0;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: 0.15s;
+      border: 1px solid transparent;
+    }
+
+    .quiz-option:hover {
+      background: #e2e8f0;
+    }
+
+    .quiz-option.correct {
+      background: #d0f0e0;
+      border-color: #2d6a4f;
+    }
+
+    .quiz-option.wrong {
+      background: #ffe0e0;
+      border-color: #c0392b;
+    }
+
+    .feedback {
+      font-size: 0.9rem;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .emoji-icon {
+      font-size: 1.4rem;
+    }
+
+    .score-bar {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      margin-top: 0.6rem;
+      background: #f1f5f9;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+    }
+
+    .progress-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .progress-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+      border: 2px solid transparent;
+    }
+
+    .progress-dot.active {
+      background: #2d6a4f;
+      color: white;
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.3);
+    }
+
+    .progress-dot:hover {
+      background: #94a3b8;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .nav-btn {
+      background: #ffffff;
+      border: none;
+      padding: 0.7rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #0b1a2e;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    .nav-btn:hover {
+      background: #e9f5f0;
+      border-color: #2d6a4f;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .compact-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .compact-table th, .compact-table td {
+      padding: 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .compact-table th {
+      color: #2d6a4f;
+      font-weight: 600;
+    }
+
+    .fruit-badge {
+      background: #fef9e7;
+      border-radius: 30px;
+      padding: 0.3rem 0.9rem;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .prompt-builder {
+      background: #f1f5f9;
+      border-radius: 1.2rem;
+      padding: 1rem;
+    }
+
+    .builder-input {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border-radius: 40px;
+      border: 1px solid #cbd5e1;
+      margin: 0.4rem 0;
+    }
+
+    .generated-prompt {
+      background: #1e3a3a;
+      color: #e9f5f0;
+      padding: 1rem;
+      border-radius: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+      white-space: pre-wrap;
+    }
+
+    .token-highlight {
+      background: #ffd966;
+      padding: 0.1rem 0.3rem;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .slide-viewport { padding: 1.5rem; }
+      .two-col { grid-template-columns: 1fr; }
+      h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="workshop-container">
+  <div class="slide-viewport" id="slideViewport">
+    <!-- dynamic slide content injected via JS -->
+  </div>
+  <div class="progress-indicator" id="progressIndicator"></div>
+  <div class="nav-buttons">
+    <button class="nav-btn" id="prevBtn" disabled>← Previous</button>
+    <button class="nav-btn" id="nextBtn">Next →</button>
+  </div>
+</div>
+
+<script>
+  // --------------------------------------------------------------
+  // SLIDE DATA: Missions 1–8, each with interactive content
+  // --------------------------------------------------------------
+  const slides = [
+    {
+      mission: 1,
+      title: "Is it AI?",
+      duration: "10 min",
+      content: `
+        <div class="content-area">
+          <p style="font-size:1.1rem; font-weight:500; margin-bottom:0.5rem;">🤖 Classroom challenge: AI or not AI?</p>
+          <p style="color:#4a5c5c; margin-bottom:0.8rem;">Click each card to reveal the answer. Then discuss the higher‑order question.</p>
+          <div class="interactive-row" id="mission1Cards">
+            <!-- cards generated by JS -->
+          </div>
+          <button class="reveal-btn" style="margin-top:1rem;" onclick="document.getElementById('m1discussion').classList.toggle('show')">💬 Higher‑order thinking question</button>
+          <div id="m1discussion" class="hidden-reveal">
+            <p><strong>ระบบอัตโนมัติ (Automation) กับปัญญาประดิษฐ์ (AI) แตกต่างกันอย่างไร?</strong><br>ระบบที่สามารถทำงานได้เองจำเป็นต้องมีสติปัญญาหรือไม่?</p>
+            <p style="margin-top:0.6rem; color:#2d6a4f;">💡 Automation follows fixed rules. AI learns patterns and can adapt.</p>
+          </div>
+          <div style="margin-top:1rem; background:#f0f7f4; border-radius:1rem; padding:0.8rem 1.2rem;">
+            <p style="font-weight:600;">📘 Academic definition (after activity):</p>
+            <p style="font-size:0.95rem;">AI is the simulation of human intelligence processes by machines, especially computer systems. These processes include learning, reasoning, and self‑correction.</p>
+          </div>
+        </div>
+      `
+    },
+    {
+      mission: 2,
+      title: "Tell the story of AI",
+      duration: "10 min",
+      content: `
+        <div class="content-area">
+          <p style="font-size:1.05rem;">📖 The evolution of AI is a story of human ambition, failure, and discovery. Click each milestone to reveal the question.</p>
+          <div class="interactive-row" id="mission2Timeline">
+            <!-- timeline items injected -->
+          </div>
+          <button class="reveal-btn" style="margin-top:1rem;" onclick="document.getElementById('m2discussion').classList.toggle('show')">🗣️ Discussion prompts</button>
+          <div id="m2discussion" class="hidden-reveal">
+            <ul style="padding-left:1.2rem; display:flex; flex-direction:column; gap:0.4rem;">
+              <li>เพราะเหตุใด AI จึงไม่ได้ประสบความสำเร็จตั้งแต่เริ่มต้น?</li>
+              <li>ข้อมูล ฮาร์ดแวร์ และอัลกอริทึม มีส่วนช่วยให้ AI พัฒนาขึ้นอย่างไร?</li>
+              <li>การที่ AI เล่นหมากรุกชนะมนุษย์ หมายความว่า AI ฉลาดกว่ามนุษย์ทุกด้านหรือไม่?</li>
+            </ul>
+          </div>
+        </div>
+      `
+    },
+    {
+      mission: 3,
+      title: "Become a machine learning model",
+      duration: "20 min",
+      content: `
+        <div class="content-area">
+          <div class="two-col">
+            <div class="interactive-card">
+              <h3 style="margin-top:0;">🍎 Supervised learning</h3>
+              <p style="font-size:0.9rem;">You are an AI trained to classify fruit. Training data: 🍎 Apple, 🍏 Apple, 🍊 Orange, 🍌 Banana.</p>
+              <div style="display:flex; gap:10px; margin:0.8rem 0; flex-wrap:wrap;">
+                <span class="fruit-badge">🍎 Red apple</span>
+                <span class="fruit-badge">🍏 Green apple</span>
+                <span class="fruit-badge">🍊 Orange</span>
+                <span class="fruit-badge">🍌 Banana</span>
+              </div>
+              <p style="font-weight:600; margin:0.5rem 0 0.2rem;">Testing data:</p>
+              <div style="background:#fef9e7; padding:0.6rem 1rem; border-radius:1rem; display:flex; align-items:center; gap:8px;">
+                <span style="font-size:2rem;">🍏</span> <span>What kind of fruit is this? (A green apple – but the model only saw red apples, so it might predict “Apple” based on shape.)</span>
+              </div>
+              <button class="reveal-btn" style="margin-top:0.8rem;" onclick="document.getElementById('m3term').classList.toggle('show')">🔍 Show terminology</button>
+              <div id="m3term" class="hidden-reveal" style="margin-top:0.6rem;">
+                <p><strong>Training, testing, prediction, generalization, data quality.</strong> Relying only on color can fail!</p>
+              </div>
+            </div>
+            <div class="interactive-card">
+              <h3 style="margin-top:0;">🧩 Unsupervised & reinforcement</h3>
+              <p style="font-size:0.9rem;"><strong>Unsupervised:</strong> Group these shapes without labels: 🔴🔵🔺🔴🔵🔺 → cluster by shape or color.</p>
+              <p style="font-size:0.9rem; margin-top:0.5rem;"><strong>Reinforcement:</strong> Agent navigates to goal. Step = reward −1. Try to find the best path.</p>
+              <div style="display:flex; gap:8px; margin:0.6rem 0;">
+                <span>🤖</span> <span>⬜⬜⬜</span> <span>🏁</span>
+              </div>
+              <p style="font-size:0.85rem; background:#e9f5f0; padding:0.5rem; border-radius:10px;">Concepts: agent, environment, action, reward, policy.</p>
+            </div>
+          </div>
+          <table class="compact-table" style="margin-top:0.8rem;">
+            <tr><th>Concept</th><th>Supervised</th><th>Unsupervised</th><th>Reinforcement</th></tr>
+            <tr><td>Learning signal</td><td>Labelled data</td><td>Patterns</td><td>Reward feedback</td></tr>
+            <tr><td>Objective</td><td>Prediction</td><td>Discover structure</td><td>Learn a policy</td></tr>
+            <tr><td>Application</td><td>Spam detection</td><td>Customer segmentation</td><td>Robot control</td></tr>
+          </table>
+        </div>
+      `
+    },
+    {
+      mission: 4,
+      title: "AI classification challenge",
+      duration: "15 min",
+      content: `
+        <div class="content-area">
+          <p style="font-size:1rem;">🗂️ One system can be classified along multiple dimensions. Assign each group a technology, then click to reveal a sample classification.</p>
+          <div class="interactive-row" id="mission4Cards">
+            <!-- cards injected -->
+          </div>
+          <button class="reveal-btn" style="margin-top:0.8rem;" onclick="document.getElementById('m4fullmap').classList.toggle('show')">🗺️ Show conceptual map</button>
+          <div id="m4fullmap" class="hidden-reveal">
+            <p><strong>Capability:</strong> ANI → AGI → ASI</p>
+            <p><strong>Functional behavior:</strong> Reactive, Limited Memory, Theory of Mind, Self‑Aware</p>
+            <p><strong>Technology:</strong> ML/DL, NLP, Computer Vision, Expert Systems, Robotics</p>
+            <p><strong>Purpose:</strong> Predictive, Generative, Assistive, Conversational, Agentic</p>
+          </div>
+        </div>
+      `
+    },
+    {
+      mission: 5,
+      title: "Become a human LLM",
+      duration: "15 min",
+      content: `
+        <div class="content-area">
+          <p style="font-size:1.05rem;">🧠 Predict the next word. Change the context and see how prediction shifts.</p>
+          <div style="background:#f1f5f9; border-radius:1.5rem; padding:1.2rem; margin:0.8rem 0;">
+            <p style="font-size:1.3rem; font-weight:600;">หลังเลิกเรียน ฉันยังไม่ได้ทานข้าว รู้สึกปวดท้อง จึงไปที่ ...</p>
+            <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin:0.8rem 0;">
+              <span class="quiz-option" onclick="this.classList.toggle('correct')">🍜 โรงอาหาร</span>
+              <span class="quiz-option" onclick="this.classList.toggle('correct')">🍽️ ร้านอาหาร</span>
+              <span class="quiz-option" onclick="this.classList.toggle('wrong')">📚 ห้องสมุด</span>
+              <span class="quiz-option" onclick="this.classList.toggle('wrong')">⚽ สนามกีฬา</span>
+            </div>
+            <p style="font-size:0.9rem; color:#2d6a4f;">Context matters! Now imagine: “ฉันกำลังเตรียมสอบ จึงไปที่ ...” → ห้องสมุด becomes more likely.</p>
+          </div>
+          <button class="reveal-btn" onclick="document.getElementById('m5concepts').classList.toggle('show')">🔑 Show LLM concepts</button>
+          <div id="m5concepts" class="hidden-reveal">
+            <p>Token & next‑token prediction · Training data · Context window · Multimodal models · Hallucination</p>
+            <p style="margin-top:0.5rem;"><strong>Critical thinking:</strong> ถ้า AI สร้างประโยคที่ดูน่าเชื่อถือ หมายความว่าข้อมูลนั้นเป็นความจริงเสมอไปหรือไม่?</p>
+          </div>
+        </div>
+      `
+    },
+    {
+      mission: 6,
+      title: "AI Olympics — benchmarking",
+      duration: "15 min",
+      content: `
+        <div class="content-area">
+          <p style="font-size:1rem;">🏅 Mini AI Benchmark — classroom scorecard</p>
+          <p style="font-size:0.9rem; color:#4a5c5c;">Rate each system 1–5 (0 = not assessed). Use the same criteria.</p>
+          <div style="overflow-x:auto;">
+            <table class="compact-table" id="scorecardTable">
+              <thead><tr><th>Criterion</th><th>ChatGPT</th><th>Gemini</th><th>Claude</th><th>DeepSeek</th></tr></thead>
+              <tbody>
+                <tr><td>Accuracy</td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="chatgpt"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="gemini"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="claude"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="deepseek"></td></tr>
+                <tr><td>Reasoning</td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="chatgpt"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="gemini"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="claude"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="deepseek"></td></tr>
+                <tr><td>Clarity</td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="chatgpt"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="gemini"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="claude"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="deepseek"></td></tr>
+                <tr><td>Instruction following</td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="chatgpt"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="gemini"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="claude"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="deepseek"></td></tr>
+                <tr><td>Verification</td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="chatgpt"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="gemini"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="claude"></td><td><input type="number" min="0" max="5" value="0" class="score-input" data-model="deepseek"></td></tr>
+                <tr><td><strong>Total / 25</strong></td><td id="total-chatgpt">0</td><td id="total-gemini">0</td><td id="total-claude">0</td><td id="total-deepseek">0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="reveal-btn" style="margin-top:0.8rem;" onclick="resetScores()">🔄 Reset scores</button>
+          <div style="margin-top:0.8rem; background:#f0f7f4; padding:0.8rem; border-radius:1rem;">
+            <p><strong>Important conclusion:</strong> There may not be one best AI for every task. Performance depends on objective, criteria, task difficulty, cost, and reliability.</p>
+          </div>
+        </div>
+      `
+    },
+    {
+      mission: 7,
+      title: "Prompt engineering challenge",
+      duration: "20 min",
+      content: `
+        <div class="content-area">
+          <p style="font-size:1rem;">🛠️ Scenario: Promote a local community product (Isan silk / OTOP) to university students.</p>
+          <div class="interactive-card" style="margin-bottom:0.8rem;">
+            <p><strong>1. Zero-shot:</strong> “ช่วยเขียนโพสต์ขายผ้าไหม”</p>
+            <p><strong>2. Role-based:</strong> “คุณคือผู้เชี่ยวชาญด้านการตลาดดิจิทัล ช่วยเขียนโพสต์…”</p>
+            <p><strong>3. Few-shot:</strong> Give examples: “ความภูมิใจในท้องถิ่น…”</p>
+            <p><strong>4. Constraints:</strong> “ไม่เกิน 80 คำ ไม่กล่าวอ้างเกินจริง ไม่สร้างข้อมูลเท็จ”</p>
+          </div>
+          <div class="prompt-builder">
+            <h3 style="margin-top:0;">⚡ Interactive prompt builder</h3>
+            <input class="builder-input" id="roleInput" placeholder="Role (e.g., digital marketing expert)" value="ผู้เชี่ยวชาญด้านการตลาดดิจิทัล">
+            <input class="builder-input" id="taskInput" placeholder="Task" value="เขียนโพสต์ประชาสัมพันธ์สินค้า">
+            <input class="builder-input" id="contextInput" placeholder="Context" value="สินค้าชุมชนจังหวัดมหาสารคาม">
+            <input class="builder-input" id="audienceInput" placeholder="Audience" value="นักศึกษามหาวิทยาลัย">
+            <input class="builder-input" id="constraintsInput" placeholder="Constraints" value="ไม่เกิน 80 คำต่อโพสต์ ไม่สร้างข้อมูลที่ไม่มีหลักฐาน">
+            <button class="reveal-btn" style="margin-top:0.5rem;" onclick="generatePrompt()">📝 Generate prompt</button>
+            <div class="generated-prompt" id="promptOutput">บทบาท: ...</div>
+            <button class="reveal-btn" style="margin-top:0.5rem;" onclick="navigator.clipboard.writeText(document.getElementById('promptOutput').innerText)">📋 Copy</button>
+          </div>
+        </div>
+      `
+    },
+    {
+      mission: 8,
+      title: "AI, society & future of Thailand",
+      duration: "15 min",
+      content: `
+        <div class="content-area">
+          <p style="font-size:1.05rem;">🇹🇭 TH-AI Passport policy analysis: Imagine you are on the committee.</p>
+          <div class="two-col">
+            <div class="interactive-card" onclick="this.querySelector('.hidden-reveal').classList.toggle('show')" style="cursor:pointer;">
+              <h3 style="margin-top:0;">📚 Education</h3>
+              <p>How should AI improve learning rather than encourage copying?</p>
+              <div class="hidden-reveal" style="margin-top:0.5rem;">💡 Consider: assessment redesign, AI as tutor, critical use.</div>
+            </div>
+            <div class="interactive-card" onclick="this.querySelector('.hidden-reveal').classList.toggle('show')" style="cursor:pointer;">
+              <h3 style="margin-top:0;">🏭 Economy</h3>
+              <p>How can AI enhance small businesses?</p>
+              <div class="hidden-reveal" style="margin-top:0.5rem;">💡 Local OTOP, personalized marketing, but ensure digital literacy.</div>
+            </div>
+            <div class="interactive-card" onclick="this.querySelector('.hidden-reveal').classList.toggle('show')" style="cursor:pointer;">
+              <h3 style="margin-top:0;">🧑‍🤝‍🧑 Digital inclusion</h3>
+              <p>How to avoid leaving vulnerable groups behind?</p>
+              <div class="hidden-reveal" style="margin-top:0.5rem;">💡 Elderly access, language support, public AI kiosks.</div>
+            </div>
+            <div class="interactive-card" onclick="this.querySelector('.hidden-reveal').classList.toggle('show')" style="cursor:pointer;">
+              <h3 style="margin-top:0;">🔒 Privacy & security</h3>
+              <p>What info should never be uploaded to AI?</p>
+              <div class="hidden-reveal" style="margin-top:0.5rem;">💡 Personal ID, passwords, sensitive community data.</div>
+            </div>
+          </div>
+          <div style="margin-top:1rem; background:#e9f5f0; border-radius:1rem; padding:0.8rem;">
+            <p><strong>Intelligence vs Wisdom:</strong> Can AI perform a task? → Should AI perform that task?<br>Can AI increase productivity? → Who benefits?<br>Can AI personalize education? → Does it preserve privacy and fairness?</p>
+          </div>
+        </div>
+      `
+    }
+  ];
+
+  // --------------------------------------------------------------
+  // STATE
+  // --------------------------------------------------------------
+  let currentSlide = 0;
+  const totalSlides = slides.length;
+  const viewport = document.getElementById('slideViewport');
+  const progressContainer = document.getElementById('progressIndicator');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  // --------------------------------------------------------------
+  // RENDER SLIDE
+  // --------------------------------------------------------------
+  function renderSlide(index) {
+    const slide = slides[index];
+    viewport.innerHTML = `
+      <div class="mission-header">
+        <span class="mission-badge">Mission ${slide.mission}</span>
+        <span class="mission-duration">⏱️ ${slide.duration}</span>
+      </div>
+      <h2>${slide.title}</h2>
+      ${slide.content}
+    `;
+
+    // Reinitialize interactive elements per slide
+    if (slide.mission === 1) initMission1();
+    if (slide.mission === 2) initMission2();
+    if (slide.mission === 3) initMission3(); // mostly static, but we keep
+    if (slide.mission === 4) initMission4();
+    if (slide.mission === 5) { /* static interactive spans */ }
+    if (slide.mission === 6) initMission6();
+    if (slide.mission === 7) initMission7();
+    if (slide.mission === 8) { /* inline onclick works */ }
+
+    updateProgressDots();
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === totalSlides - 1;
+  }
+
+  // Mission 1: generate AI or not AI cards
+  function initMission1() {
+    const container = document.getElementById('mission1Cards');
+    if (!container) return;
+    const items = [
+      { label: "🧮 เครื่องคิดเลขธรรมดา", isAI: false, reason: "ไม่ใช่ AI – คำนวณตามขั้นตอนที่กำหนดไว้" },
+      { label: "🎵 TikTok แนะนำวิดีโอ", isAI: true, reason: "ใช่ – ใช้โมเดลเรียนรู้รูปแบบความสนใจของผู้ใช้" },
+      { label: "⏰ พัดลมตั้งเวลา", isAI: false, reason: "ไม่ใช่ – ทำงานตามเวลาที่ตั้งไว้ ไมเรียนรู้" },
+      { label: "📸 ระบบจดจำใบหน้า", isAI: true, reason: "ใช่ – ใช้ computer vision และ ML" },
+      { label: "💬 ChatGPT", isAI: true, reason: "ใช่ – LLM ขนาดใหญ่" },
+      { label: "🤖 หุ่นยนต์ดูดฝุ่น", isAI: true, reason: "ใช่ (บางรุ่น) – ใช้ sensor และการเรียนรู้เส้นทาง" }
+    ];
+    container.innerHTML = items.map((item, idx) => `
+      <div class="interactive-card clickable" onclick="this.querySelector('.hidden-reveal').classList.toggle('show')">
+        <p style="font-weight:600;">${item.label}</p>
+        <div class="hidden-reveal" style="margin-top:0.4rem; font-size:0.85rem;">
+          <span style="background:${item.isAI ? '#d0f0e0' : '#ffe0e0'}; padding:0.2rem 0.6rem; border-radius:20px;">${item.isAI ? '✅ AI' : '❌ Not AI'}</span>
+          <p style="margin-top:0.3rem;">${item.reason}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Mission 2: timeline
+  function initMission2() {
+    const container = document.getElementById('mission2Timeline');
+    if (!container) return;
+    const events = [
+      { year: "1950", question: "Can machines think?", detail: "Alan Turing raises fundamental question." },
+      { year: "1960s", question: "Can machines communicate?", detail: "ELIZA imitates conversation patterns." },
+      { year: "1997", question: "Can machines outperform humans?", detail: "Deep Blue defeats chess champion." },
+      { year: "2012", question: "Can machines recognize the world?", detail: "AlexNet and deep learning breakthrough." },
+      { year: "2017", question: "Can machines learn through experience?", detail: "AlphaZero self‑play." },
+      { year: "2022", question: "Can machines generate content?", detail: "ChatGPT brings generative AI to public." },
+      { year: "Modern", question: "Can machines perform multi‑step tasks?", detail: "Agentic AI: planning, decision-making, tool use." }
+    ];
+    container.innerHTML = events.map(e => `
+      <div class="interactive-card clickable" onclick="this.querySelector('.hidden-reveal').classList.toggle('show')" style="flex:1 1 160px;">
+        <p style="font-weight:700; color:#2d6a4f;">${e.year}</p>
+        <p style="font-size:0.9rem; font-weight:500;">${e.question}</p>
+        <div class="hidden-reveal" style="margin-top:0.4rem; font-size:0.8rem;">${e.detail}</div>
+      </div>
+    `).join('');
+  }
+
+  function initMission3() { /* already handled via inline reveals */ }
+
+  function initMission4() {
+    const container = document.getElementById('mission4Cards');
+    if (!container) return;
+    const systems = [
+      { name: "🧑‍🏫 AI Tutor", cap: "ANI / task‑oriented", behavior: "Limited Memory", tech: "Deep Learning, NLP", purpose: "Generative, Conversational, Assistive" },
+      { name: "🚗 Self-driving car", cap: "ANI", behavior: "Limited Memory", tech: "Computer Vision, ML", purpose: "Predictive, Agentic" },
+      { name: "📸 Face recognition", cap: "ANI", behavior: "Reactive", tech: "Computer Vision, DL", purpose: "Predictive" },
+      { name: "🌾 Agricultural AI", cap: "ANI", behavior: "Limited Memory", tech: "ML, Computer Vision", purpose: "Predictive, Assistive" },
+      { name: "🛍️ Recommendation AI", cap: "ANI", behavior: "Limited Memory", tech: "ML, NLP", purpose: "Predictive, Generative" },
+      { name: "🎨 Image generator", cap: "ANI", behavior: "Limited Memory", tech: "Deep Learning, Generative", purpose: "Generative" }
+    ];
+    container.innerHTML = systems.map(s => `
+      <div class="interactive-card clickable" onclick="this.querySelector('.hidden-reveal').classList.toggle('show')" style="flex:1 1 200px;">
+        <p style="font-weight:600;">${s.name}</p>
+        <div class="hidden-reveal" style="margin-top:0.4rem; font-size:0.8rem;">
+          <p><strong>Capability:</strong> ${s.cap}</p>
+          <p><strong>Behavior:</strong> ${s.behavior}</p>
+          <p><strong>Technology:</strong> ${s.tech}</p>
+          <p><strong>Purpose:</strong> ${s.purpose}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Mission 6: scorecard logic
+  function initMission6() {
+    const inputs = document.querySelectorAll('.score-input');
+    inputs.forEach(inp => {
+      inp.addEventListener('input', updateTotals);
+    });
+    updateTotals();
+  }
+
+  function updateTotals() {
+    const models = ['chatgpt', 'gemini', 'claude', 'deepseek'];
+    models.forEach(model => {
+      const inputs = document.querySelectorAll(`.score-input[data-model="${model}"]`);
+      let total = 0;
+      inputs.forEach(inp => { total += Number(inp.value) || 0; });
+      const totalEl = document.getElementById(`total-${model}`);
+      if (totalEl) totalEl.innerText = total;
+    });
+  }
+
+  window.resetScores = function() {
+    document.querySelectorAll('.score-input').forEach(inp => { inp.value = '0'; });
+    updateTotals();
+  };
+
+  // Mission 7: prompt builder
+  function initMission7() {
+    const genBtn = document.querySelector('#mission7GenerateBtn');
+    // uses global function
+  }
+
+  window.generatePrompt = function() {
+    const role = document.getElementById('roleInput')?.value || '';
+    const task = document.getElementById('taskInput')?.value || '';
+    const context = document.getElementById('contextInput')?.value || '';
+    const audience = document.getElementById('audienceInput')?.value || '';
+    const constraints = document.getElementById('constraintsInput')?.value || '';
+    const output = document.getElementById('promptOutput');
+    if (output) {
+      output.innerText = `บทบาท: ${role}\nเป้าหมาย: ${task}\nบริบท: ${context}\nกลุ่มเป้าหมาย: ${audience}\nข้อจำกัด: ${constraints}\nโปรดระบุข้อมูลที่ยังต้องตรวจสอบเพิ่มเติม`;
+    }
+  };
+
+  // --------------------------------------------------------------
+  // NAVIGATION & PROGRESS
+  // --------------------------------------------------------------
+  function updateProgressDots() {
+    progressContainer.innerHTML = slides.map((s, i) => `
+      <div class="progress-dot ${i === currentSlide ? 'active' : ''}" onclick="goToSlide(${i})">${s.mission}</div>
+    `).join('');
+  }
+
+  window.goToSlide = function(index) {
+    if (index < 0 || index >= totalSlides) return;
+    currentSlide = index;
+    renderSlide(currentSlide);
+  };
+
+  prevBtn.addEventListener('click', () => {
+    if (currentSlide > 0) goToSlide(currentSlide - 1);
+  });
+  nextBtn.addEventListener('click', () => {
+    if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+  });
+
+  // keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextBtn.click();
+    if (e.key === 'ArrowLeft') prevBtn.click();
+  });
+
+  // --------------------------------------------------------------
+  // INIT
+  // --------------------------------------------------------------
+  renderSlide(0);
+</script>
+</body>
+</html>
